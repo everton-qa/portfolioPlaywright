@@ -9,6 +9,7 @@ const {
     validarCadastroSucesso2,
     validarCadastroFalha2,
     validarCadastroFalhaNome2,
+    cadastroComSucesso2
 } = require('./page-Cadastro')
 
 test.describe('Cadastro de Usuário', () => {

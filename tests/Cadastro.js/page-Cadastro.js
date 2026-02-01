@@ -1,4 +1,4 @@
-const { expect }= require('@playwright/test');
+const { expect } = require('@playwright/test');
 
 const abrirSite2 = async (page) => {
     await page.goto('https://automationpratice.com.br/register')
@@ -27,11 +27,12 @@ const validarCadastroFalhaNome2 = async (page) => {
     await expect(page.getByText('O campo nome deve ser')).toBeVisible()
 }
 const cadastroComSucesso2 = async (page) => {
-      await PreencheNome2(page)
-        await PreencheEmail2(page)
-        await PreencheSenha2(page)
-        await ClicarCadastrar2(page)
-        await validarCadastroSucesso2(page)
+ //   await page.goto('https://automationpratice.com.br/register')
+    await page.locator('#user').fill('eullin do zap')
+    await page.locator('#email').fill('eullin@hotmail.com')
+    await page.locator('#password').fill('12345678')
+    await page.getByRole('button', { name: 'Cadastrar' }).click()
+    await expect(page.getByRole('heading', { name: 'Cadastro realizado!' })).toBeVisible()
 }
 
 module.exports = {
