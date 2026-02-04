@@ -4,14 +4,23 @@ const abrirSite2 = async (page) => {
     await page.goto('https://automationpratice.com.br/register')
 }
 
-const PreencheNome2 = async (page) => {
-    await page.locator('#user').fill('eullin do zap')
+const PreencheNome2 = async (
+    page,
+    nome = 'eullin do zap'
+) => {
+    await page.locator('#user').fill(nome)
 }
-const PreencheEmail2 = async (page) => {
-    await page.locator('#email').fill('eullin@hotmail.com')
+const PreencheEmail2 = async (
+    page,
+    email = 'eullin@hotmail.com'
+) => {
+    await page.locator('#email').fill(email)
 }
-const PreencheSenha2 = async (page) => {
-    await page.locator('#password').fill('12345678')
+const PreencheSenha2 = async (
+    page,
+    senha = '12345678'
+) => {
+    await page.locator('#password').fill(senha)
 }
 const ClicarCadastrar2 = async (page) => {
     await page.getByRole('button', { name: 'Cadastrar' }).click()
@@ -19,15 +28,24 @@ const ClicarCadastrar2 = async (page) => {
 const validarCadastroSucesso2 = async (page) => {
     await expect(page.getByRole('heading', { name: 'Cadastro realizado!' })).toBeVisible()
 }
-const validarCadastroFalha2 = async (page) => {
-    await expect(page.getByText('O campo e-mail deve ser')).toBeVisible()
+const mensagensErroCadastro = {
+  nome: 'O campo nome deve ser',
+  email: 'O campo e-mail deve ser',
+  senha: 'O campo senha deve ter pelo',
+}
 
+const validarCadastroFalha2 = async (page, tipo) => {
+  const mensagem = mensagensErroCadastro[tipo]
+
+  if (!mensagem) {
+    throw new Error(`Tipo de erro inválido: ${tipo}`)
+  }
+
+  await expect(page.getByText(mensagem)).toBeVisible()
 }
-const validarCadastroFalhaNome2 = async (page) => {
-    await expect(page.getByText('O campo nome deve ser')).toBeVisible()
-}
+
 const cadastroComSucesso2 = async (page) => {
- //   await page.goto('https://automationpratice.com.br/register')
+    //   await page.goto('https://automationpratice.com.br/register')
     await page.locator('#user').fill('eullin do zap')
     await page.locator('#email').fill('eullin@hotmail.com')
     await page.locator('#password').fill('12345678')
@@ -43,7 +61,8 @@ module.exports = {
     ClicarCadastrar2,
     validarCadastroSucesso2,
     validarCadastroFalha2,
-    validarCadastroFalhaNome2,
     cadastroComSucesso2
+
 }// 
+
 
