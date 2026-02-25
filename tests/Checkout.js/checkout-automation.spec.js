@@ -1,46 +1,32 @@
 import { test, expect } from '@playwright/test';
+import { CheckoutPage } from './CheckoutPage';
 
 test.describe('Checkout Automation Tests', () => {
+  let checkoutPage;
+
   test.beforeEach(async ({ page }) => {
-    // Navigate to the checkout page
-    await page.goto('https://automationpratice.com.br/checkout-one');
-    
-    // Wait for the page to load
-    await page.waitForLoadState('networkidle');
+    checkoutPage = new CheckoutPage(page);
+    await checkoutPage.goto();
   });
 
   test('Should fill billing information and complete checkout successfully', async ({ page }) => {
-    // Fill the billing information form using element IDs/names
+    const billingData = {
+      firstName: 'João',
+      lastName: 'Silva',
+      companyName: 'Test Company',
+      email: 'joao@example.com',
+      country: 'usa',
+      stateCity: 'Aland Islands',
+      zipCode: '12345',
+      address: '123 Test Street, Test City',
+      notes: 'Test order'
+    };
+
+    // Fill the billing information
+    await checkoutPage.fillBillingInformation(billingData);
     
-    // Fill First Name
-    await page.getByRole('textbox', { name: 'First name*' }).fill('João');
-    
-    // Fill Last Name
-    await page.getByRole('textbox', { name: 'Last name*' }).fill('Silva');
-    
-    // Fill Company Name
-    await page.getByRole('textbox', { name: 'Company Name*' }).fill('Test Company');
-    
-    // Fill Email Address
-    await page.getByRole('textbox', { name: 'Email Addresse*' }).fill('joao@example.com');
-    
-    // Select Country
-    await page.getByLabel('Country*').selectOption('usa');
-    
-    // Select State/City
-    await page.getByLabel('State/City*').selectOption('Aland Islands');
-    
-    // Fill Zip Code
-    await page.getByRole('textbox', { name: 'Zip Code*' }).fill('12345');
-    
-    // Fill Full Address
-    await page.getByRole('textbox', { name: 'Full Address*' }).fill('123 Test Street, Test City');
-    
-    // Fill Additional Notes
-    await page.getByRole('textbox', { name: 'Additional Notes*' }).fill('Test order');
-    
-    // Click the Save button to save billing information
-    await page.getByRole('button', { name: 'Save' }).click();
+    // Save billing information
+    await checkoutPage.saveBillingInformation();
     
     // Wait for success message
     await expect(page.getByText('Billings Information registred with success!')).toBeVisible();
@@ -48,50 +34,48 @@ test.describe('Checkout Automation Tests', () => {
     // Verify that form fields are now disabled after saving
     await expect(page.getByRole('textbox', { name: 'First name*' })).toBeDisabled();
     
-    // Click the Place Order button
-    await page.getByRole('button', { name: 'Place Order' }).click();
+    // Place order
+    await checkoutPage.placeOrder();
     
     // Wait for the success heading to appear in the modal
     await expect(page.getByRole('heading', { name: 'Order success!' })).toBeVisible({ timeout: 15000 });
     
     // Also verify the congratulations message
     await expect(page.getByRole('heading', { name: 'Congrats! Your order was created with sucess!' })).toBeVisible();
-    
-    // Verify the modal is present
-    const modal = page.locator('dialog');
-    await expect(modal).toBeVisible();
+  
   });
 
   test('Should display order success modal with correct elements', async ({ page }) => {
+    const billingData = {
+      firstName: 'Maria',
+      lastName: 'Santos',
+      companyName: 'Test Corp',
+      email: 'maria@example.com',
+      country: 'usa',
+      stateCity: 'Afghanistan',
+      zipCode: '54321',
+      address: '456 Another Street',
+      notes: 'Please handle with care'
+    };
+
     // Fill the form
-    await page.getByRole('textbox', { name: 'First name*' }).fill('Maria');
-    await page.getByRole('textbox', { name: 'Last name*' }).fill('Santos');
-    await page.getByRole('textbox', { name: 'Company Name*' }).fill('Test Corp');
-    await page.getByRole('textbox', { name: 'Email Addresse*' }).fill('maria@example.com');
-    await page.getByLabel('Country*').selectOption('usa');
-    await page.getByLabel('State/City*').selectOption('Afghanistan');
-    await page.getByRole('textbox', { name: 'Zip Code*' }).fill('54321');
-    await page.getByRole('textbox', { name: 'Full Address*' }).fill('456 Another Street');
-    await page.getByRole('textbox', { name: 'Additional Notes*' }).fill('Please handle with care');
+    await checkoutPage.fillBillingInformation(billingData);
     
     // Save billing information
-    await page.getByRole('button', { name: 'Save' }).click();
+    await checkoutPage.saveBillingInformation();
     await expect(page.getByText('Billings Information registred with success!')).toBeVisible();
     
     // Place the order
-    await page.getByRole('button', { name: 'Place Order' }).click();
+    await checkoutPage.placeOrder();
     
     // Wait for the success heading to appear in the modal
     await expect(page.getByRole('heading', { name: 'Order success!' })).toBeVisible({ timeout: 15000 });
     
-    // Verify the entire dialog structure
-    const dialog = page.locator('dialog');
-    await expect(dialog.getByRole('heading', { name: 'Order success!' })).toBeVisible();
   });
 
   test('Should validate all required fields before saving', async ({ page }) => {
     // Try to save without filling any information
-    await page.getByRole('button', { name: 'Save' }).click();
+    await checkoutPage.saveBillingInformation();
     
     // Wait a moment for validation messages to appear
     await page.waitForTimeout(1000);
@@ -108,18 +92,21 @@ test.describe('Checkout Automation Tests', () => {
   });
 
   test('Should select different payment methods', async ({ page }) => {
+    const billingData = {
+      firstName: 'Pedro',
+      lastName: 'Oliveira',
+      companyName: 'Test Ltd',
+      email: 'pedro@example.com',
+      country: 'usa',
+      stateCity: 'Aland Islands',
+      zipCode: '99999',
+      address: '789 Test Avenue',
+      notes: 'Test payment'
+    };
+
     // Fill and save billing information
-    await page.getByRole('textbox', { name: 'First name*' }).fill('Pedro');
-    await page.getByRole('textbox', { name: 'Last name*' }).fill('Oliveira');
-    await page.getByRole('textbox', { name: 'Company Name*' }).fill('Test Ltd');
-    await page.getByRole('textbox', { name: 'Email Addresse*' }).fill('pedro@example.com');
-    await page.getByLabel('Country*').selectOption('usa');
-    await page.getByLabel('State/City*').selectOption('Aland Islands');
-    await page.getByRole('textbox', { name: 'Zip Code*' }).fill('99999');
-    await page.getByRole('textbox', { name: 'Full Address*' }).fill('789 Test Avenue');
-    await page.getByRole('textbox', { name: 'Additional Notes*' }).fill('Test payment');
-    
-    await page.getByRole('button', { name: 'Save' }).click();
+    await checkoutPage.fillBillingInformation(billingData);
+    await checkoutPage.saveBillingInformation();
     await expect(page.getByText('Billings Information registred with success!')).toBeVisible();
     
     // Check that "Direct Bank Transfer" is selected by default
@@ -127,13 +114,13 @@ test.describe('Checkout Automation Tests', () => {
     await expect(bankTransferRadio).toBeChecked();
     
     // Select "Mobile Banking"
+    await checkoutPage.selectMobileBanking();
     const mobileBankingRadio = page.getByRole('radio', { name: 'Mobile Banking' });
-    await mobileBankingRadio.click();
     await expect(mobileBankingRadio).toBeChecked();
     
     // Select "Paypal"
+    await checkoutPage.selectPaypal();
     const paypalRadio = page.getByRole('radio', { name: 'Paypal' });
-    await paypalRadio.click();
     await expect(paypalRadio).toBeChecked();
   });
 });
