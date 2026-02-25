@@ -40,8 +40,8 @@ GitHub Actions
 
 
 --------------------------------------------------------------
-.
 Estrutura do Projeto
+.
 ├── .github/
 │   └── workflows/
 │       └── playwright.yml
